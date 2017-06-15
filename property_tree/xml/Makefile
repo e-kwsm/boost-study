@@ -6,18 +6,19 @@ LDLIBS   :=
 SRCS     := $(wildcard *.cpp)
 TARGET   := $(SRCS:.cpp=)
 
-.PHONY: all clean distclean
-
+.PHONY: all
 all: $(TARGET)
 
 %: %.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $<
 
+.PHONY: clean
 clean:
 	rm -f $(TARGET)
 
-tags: $(SRCS)
-	ctags $^
-
+.PHONY: distclean
 distclean: clean
 	rm -f tags
+
+tags: $(SRCS)
+	ctags $^
