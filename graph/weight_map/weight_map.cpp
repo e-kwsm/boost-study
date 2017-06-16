@@ -45,13 +45,13 @@ using Graph = boost::adjacency_list<
 int main()
 {
     /*
-     *      1    2
+     *      1    4
      *   A----B----C
-     *   |    |
-     *  4|   8|
-     *   |    |
-     *   D----E
-     *     16
+     *   |    |    |
+     *  2|   8|    | 32
+     *   |    |    |
+     *   D----E----F
+     *     16   64
      */
 
     Graph g;
@@ -61,12 +61,15 @@ int main()
     const auto c = add_vertex({"C"}, g);
     const auto d = add_vertex({"D"}, g);
     const auto e = add_vertex({"E"}, g);
+    const auto f = add_vertex({"F"}, g);
 
     add_edge(a, b, {1},  g);
-    add_edge(b, c, {2},  g);
-    add_edge(a, d, {4},  g);
+    add_edge(a, d, {2},  g);
+    add_edge(b, c, {4},  g);
     add_edge(b, e, {8},  g);
     add_edge(d, e, {16}, g);
+    add_edge(c, f, {32}, g);
+    add_edge(e, f, {64}, g);
 
     std::cout << "# boost::print_graph\n";
     boost::print_graph(g, get(&Vertex::name, g));
