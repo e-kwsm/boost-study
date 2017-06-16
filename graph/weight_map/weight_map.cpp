@@ -56,19 +56,17 @@ int main()
 
     Graph g;
 
-    auto a = add_vertex(g); g[a] = {"A"};
-    auto b = add_vertex(g); g[b] = {"B"};
-    auto c = add_vertex(g); g[c] = {"C"};
-    auto d = add_vertex(g); g[d] = {"D"};
-    auto e = add_vertex(g); g[e] = {"E"};
+    const auto a = add_vertex({"A"}, g);
+    const auto b = add_vertex({"B"}, g);
+    const auto c = add_vertex({"C"}, g);
+    const auto d = add_vertex({"D"}, g);
+    const auto e = add_vertex({"E"}, g);
 
-    Graph::edge_descriptor edge;
-    bool inserted;
-    boost::tie(edge, inserted) = add_edge(a, b, g); if (!inserted) throw; g[edge] = {1};
-    boost::tie(edge, inserted) = add_edge(b, c, g); if (!inserted) throw; g[edge] = {2};
-    boost::tie(edge, inserted) = add_edge(a, d, g); if (!inserted) throw; g[edge] = {4};
-    boost::tie(edge, inserted) = add_edge(b, e, g); if (!inserted) throw; g[edge] = {8};
-    boost::tie(edge, inserted) = add_edge(d, e, g); if (!inserted) throw; g[edge] = {16};
+    add_edge(a, b, {1},  g);
+    add_edge(b, c, {2},  g);
+    add_edge(a, d, {4},  g);
+    add_edge(b, e, {8},  g);
+    add_edge(d, e, {16}, g);
 
     std::cout << "# boost::print_graph\n";
     boost::print_graph(g, get(&Vertex::name, g));
