@@ -77,64 +77,64 @@ int main()
      *     16   64
      */
 
-    Graph g;
+    Graph graph;
 
-    const auto a = add_vertex({"A"}, g);
-    const auto b = add_vertex({"B"}, g);
-    const auto c = add_vertex({"C"}, g);
-    const auto d = add_vertex({"D"}, g);
-    const auto e = add_vertex({"E"}, g);
-    const auto f = add_vertex({"F"}, g);
+    const auto va = add_vertex({"A"}, graph);
+    const auto vb = add_vertex({"B"}, graph);
+    const auto vc = add_vertex({"C"}, graph);
+    const auto vd = add_vertex({"D"}, graph);
+    const auto ve = add_vertex({"E"}, graph);
+    const auto vf = add_vertex({"F"}, graph);
 
-    add_edge(a, b, {1},  g);
-    add_edge(a, d, {2},  g);
-    add_edge(b, c, {4},  g);
-    add_edge(b, e, {8},  g);
-    add_edge(d, e, {16}, g);
-    add_edge(c, f, {32}, g);
-    add_edge(e, f, {64}, g);
+    add_edge(va, vb, {1},  graph);
+    add_edge(va, vd, {2},  graph);
+    add_edge(vb, vc, {4},  graph);
+    add_edge(vb, ve, {8},  graph);
+    add_edge(vd, ve, {16}, graph);
+    add_edge(vc, vf, {32}, graph);
+    add_edge(ve, vf, {64}, graph);
 
     std::cout << "# boost::print_graph\n";
-    boost::print_graph(g, get(&Vertex::name, g));
+    boost::print_graph(graph, get(&Vertex::name, graph));
     std::cout << "# boost::print_vertices\n";
-    boost::print_vertices(g, get(&Vertex::name, g));
+    boost::print_vertices(graph, get(&Vertex::name, graph));
     std::cout << "# iterate over vertices\n";
-    for (auto v : boost::make_iterator_range(vertices(g)))
-        std::cout << v << '\t' << g[v] << '\n';
+    for (auto v : boost::make_iterator_range(vertices(graph)))
+        std::cout << v << '\t' << graph[v] << '\n';
     std::cout << "# boost::print_edges\n";
-    boost::print_edges(g, get(&Vertex::name, g));
+    boost::print_edges(graph, get(&Vertex::name, graph));
     std::cout << "# iterate over edges\n";
-    for (auto e : boost::make_iterator_range(edges(g)))
-        std::cout << e << '\t' << g[e] << '\n';
+    for (auto e : boost::make_iterator_range(edges(graph)))
+        std::cout << e << '\t' << graph[e] << '\n';
 
     auto output_distances = [&](Graph::vertex_descriptor v)
     {
         std::cout << "# boost::dijkstra_shortest_paths\n";
-        std::vector<decltype(Edge::weight)> distances(boost::num_vertices(g));
-        boost::dijkstra_shortest_paths(g, v,
+        std::vector<decltype(Edge::weight)> distances(boost::num_vertices(graph));
+        boost::dijkstra_shortest_paths(graph, v,
                 boost::weight_map(
                     boost::make_function_property_map<Graph::edge_descriptor>(
                         [&](const Graph::edge_descriptor& e)->decltype(Edge::weight)
-                        { return g[e].weight; })
+                        { return graph[e].weight; })
                     ).distance_map(&distances[0]));
 
-        for (auto i : boost::make_iterator_range(vertices(g)))
+        for (auto i : boost::make_iterator_range(vertices(graph)))
         {
-            std::cout << g[v].name << " - " << g[i].name << "\t" << distances[i] << '\n';
+            std::cout << graph[v].name << " - " << graph[i].name << "\t" << distances[i] << '\n';
         }
     };
 
     auto output_distances_threshold = [&](Graph::vertex_descriptor v, unsigned threshold)
     {
         std::cout << "# boost::dijkstra_shortest_paths w/ custom visitor\n";
-        std::vector<decltype(Edge::weight)> distances(boost::num_vertices(g));
+        std::vector<decltype(Edge::weight)> distances(boost::num_vertices(graph));
         try
         {
-            boost::dijkstra_shortest_paths(g, v,
+            boost::dijkstra_shortest_paths(graph, v,
                     boost::weight_map(
                         boost::make_function_property_map<Graph::edge_descriptor>(
                             [&](const Graph::edge_descriptor& e)->decltype(Edge::weight)
-                            { return g[e].weight; }
+                            { return graph[e].weight; }
                             )
                         ).distance_map(&distances[0])
                     .visitor(threshold_visitor{threshold}));
@@ -142,22 +142,22 @@ int main()
         catch (reach_threshold)
         {}
 
-        for (auto i : boost::make_iterator_range(vertices(g)))
+        for (auto i : boost::make_iterator_range(vertices(graph)))
         {
             auto d = distances[i];
             if (d == std::numeric_limits<decltype(Edge::weight)>::max())
                 std::cout << '#';
-            std::cout << g[v].name << " - " << g[i].name << "\t" << d << '\n';
+            std::cout << graph[v].name << " - " << graph[i].name << "\t" << d << '\n';
         }
     };
 
-    output_distances(a);
-    output_distances_threshold(a, 2);
+    output_distances(va);
+    output_distances_threshold(va, 2);
 
 #ifdef GRAPHVIZ
     std::string fname = "graph.dot";
     std::ofstream ofs{fname};
-    boost::write_graphviz(ofs, g, boost::make_label_writer(get(&Vertex::name, g)));
+    boost::write_graphviz(ofs, graph, boost::make_label_writer(get(&Vertex::name, graph)));
     ofs.close();
     std::system(std::string{"dot -Tpng -ograph.png " + fname}.c_str());
 #endif
