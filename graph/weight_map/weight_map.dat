@@ -1,0 +1,40 @@
+# boost::print_graph
+A <--> B D 
+B <--> A C E 
+C <--> B F 
+D <--> A E 
+E <--> B D F 
+F <--> C E 
+# boost::print_vertices
+A B C D E F 
+# iterate over vertices
+0	A
+1	B
+2	C
+3	D
+4	E
+5	F
+# boost::print_edges
+(A,B) (A,D) (B,C) (B,E) (D,E) (C,F) (E,F) 
+# iterate over edges
+(0,1)	1
+(0,3)	2
+(1,2)	4
+(1,4)	8
+(3,4)	16
+(2,5)	32
+(4,5)	64
+# boost::dijkstra_shortest_paths
+A - A	0
+A - B	1
+A - C	5
+A - D	2
+A - E	9
+A - F	37
+# boost::dijkstra_shortest_paths w/ custom visitor
+A - A	0
+A - B	1
+A - C	5
+A - D	2
+A - E	9
+#A - F	4294967295
