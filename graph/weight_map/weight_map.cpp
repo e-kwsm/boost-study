@@ -11,6 +11,27 @@
 #include <boost/property_map/function_property_map.hpp>
 #include <boost/range/iterator_range_core.hpp>
 
+struct reach_threshold {};
+
+template<typename EdgeWeight> struct threshold_visitor : boost::default_dijkstra_visitor {
+  threshold_visitor(EdgeWeight threshold) : threshold{threshold}, total_weight{0} {}
+
+  template<typename Edge, typename Graph> void examine_edge(Edge e, const Graph& g) {
+    min_weight = min_weight ? std::min(*min_weight, g[e].weight) : g[e].weight;
+  }
+  template<typename Vertex, typename Graph> void finish_vertex(Vertex v, const Graph& g) {
+    if (min_weight)
+      total_weight += *min_weight;
+    if (total_weight >= threshold)
+      throw reach_threshold{};
+    min_weight = boost::none;
+  }
+
+  const EdgeWeight threshold;
+  EdgeWeight total_weight;
+  boost::optional<EdgeWeight> min_weight;
+};
+
 struct Vertex {
   std::string name;
 };
@@ -29,36 +50,6 @@ std::ostream& operator<<(std::ostream& os, const Edge& e) {
   return os;
 }
 
-using Graph = boost::adjacency_list<boost::listS,       // OutEdgeList
-                                    boost::vecS,        // VertexList
-                                    boost::undirectedS, // Directed
-                                    Vertex,             // VertexProperties
-                                    Edge,               // EdgeProperties
-                                    boost::no_property, // GraphProperties
-                                    boost::listS        // EdgeList
-                                    >;
-
-struct reach_threshold {};
-
-struct threshold_visitor : boost::default_dijkstra_visitor {
-  threshold_visitor(decltype(Edge::weight) threshold) : threshold{threshold}, total_weight{0} {}
-
-  void examine_edge(Graph::edge_descriptor e, const Graph& g) {
-    min_weight = min_weight ? std::min(*min_weight, g[e].weight) : g[e].weight;
-  }
-  void finish_vertex(Graph::vertex_descriptor v, const Graph& g) {
-    if (min_weight)
-      total_weight += *min_weight;
-    if (total_weight >= threshold)
-      throw reach_threshold{};
-    min_weight = boost::none;
-  }
-
-  const decltype(Edge::weight) threshold;
-  decltype(Edge::weight) total_weight;
-  boost::optional<decltype(Edge::weight)> min_weight;
-};
-
 int main() {
   /*
    *      1    4
@@ -70,6 +61,12 @@ int main() {
    *     16   64
    */
 
+  using Graph = boost::adjacency_list<boost::listS,       // OutEdgeList
+                                      boost::vecS,        // VertexList
+                                      boost::undirectedS, // Directed
+                                      Vertex,             // VertexProperties
+                                      Edge                // EdgeProperties
+                                      >;
   Graph graph;
 
   const auto va = boost::add_vertex({"A"}, graph);
@@ -122,7 +119,7 @@ int main() {
           boost::weight_map(boost::make_function_property_map<Graph::edge_descriptor>(
                                 [&](const Graph::edge_descriptor& e) { return graph[e].weight; }))
               .distance_map(&distances[0])
-              .visitor(threshold_visitor{threshold}));
+              .visitor(threshold_visitor<decltype(Edge::weight)>{threshold}));
     } catch (reach_threshold) {
     }
 
