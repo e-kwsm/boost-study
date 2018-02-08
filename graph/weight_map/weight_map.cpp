@@ -97,25 +97,31 @@ int main() {
   for (auto e : boost::make_iterator_range(edges(graph)))
     std::cout << e << '\t' << graph[e] << '\n';
 
-  auto output_distances = [&](Graph::vertex_descriptor v) {
+  auto output_distances = [&](Graph::vertex_descriptor src, Graph::vertex_descriptor dest) {
     std::cout << "# boost::dijkstra_shortest_paths\n";
     std::vector<decltype(Edge::weight)> distances(boost::num_vertices(graph));
+    std::vector<Graph::vertex_descriptor> predecessors(boost::num_vertices(graph));
     boost::dijkstra_shortest_paths(
-        graph, v,
+        graph, src,
         boost::weight_map(boost::make_function_property_map<Graph::edge_descriptor>(
                               [&](const Graph::edge_descriptor& e) { return graph[e].weight; }))
-            .distance_map(&distances[0]));
+            .distance_map(&distances[0])
+            .predecessor_map(&predecessors[0]));
 
     for (auto i : boost::make_iterator_range(vertices(graph)))
-      std::cout << graph[v].name << " - " << graph[i].name << "\t" << distances[i] << '\n';
+      std::cout << graph[src].name << " - " << graph[i].name << "\t" << distances[i] << '\n';
+
+    for (auto v = dest; v != src; v = predecessors[v])
+      std::cout << graph[v] << " - ";
+    std::cout << graph[src] << '\n';
   };
 
-  auto output_distances_threshold = [&](Graph::vertex_descriptor v, unsigned threshold) {
+  auto output_distances_threshold = [&](Graph::vertex_descriptor src, unsigned threshold) {
     std::cout << "# boost::dijkstra_shortest_paths w/ custom visitor\n";
     std::vector<decltype(Edge::weight)> distances(boost::num_vertices(graph));
     try {
       boost::dijkstra_shortest_paths(
-          graph, v,
+          graph, src,
           boost::weight_map(boost::make_function_property_map<Graph::edge_descriptor>(
                                 [&](const Graph::edge_descriptor& e) { return graph[e].weight; }))
               .distance_map(&distances[0])
@@ -127,11 +133,11 @@ int main() {
       auto d = distances[i];
       if (d == std::numeric_limits<decltype(Edge::weight)>::max())
         std::cout << '#';
-      std::cout << graph[v].name << " - " << graph[i].name << "\t" << d << '\n';
+      std::cout << graph[src].name << " - " << graph[i].name << "\t" << d << '\n';
     }
   };
 
-  output_distances(va);
+  output_distances(va, vf);
   output_distances_threshold(va, 2);
 
 #ifdef GRAPHVIZ
