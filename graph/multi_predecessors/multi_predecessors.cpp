@@ -26,9 +26,24 @@ public:
     edges.clear();
   }
 
-private:
+protected:
   PredecessorsMap predecessors_map;
   std::vector<Edge> edges;
+};
+
+template<typename Edge, typename PredecessorsMap, typename DistanceMap>
+class multi_predecessors_map_w_distances : public multi_predecessors_map<Edge, PredecessorsMap> {
+public:
+  multi_predecessors_map_w_distances(PredecessorsMap predecessors_map, DistanceMap distance_map)
+      : multi_predecessors_map<Edge, PredecessorsMap>{predecessors_map}, distance_map{
+                                                                             distance_map} {}
+
+  template<typename Graph> void tree_edge(Edge e, const Graph& g) {
+    distance_map[boost::target(e, g)] = distance_map[boost::source(e, g)] + 1;
+  }
+
+private:
+  DistanceMap distance_map;
 };
 
 int main() {
@@ -84,12 +99,19 @@ int main() {
 
   auto output_distances = [&](Graph::vertex_descriptor src) {
     std::multimap<Graph::vertex_descriptor, Graph::vertex_descriptor> predecessors;
+    std::vector<unsigned> distances(boost::num_vertices(graph));
 
     boost::breadth_first_search(
         graph, src,
-        boost::visitor(multi_predecessors_map<Graph::edge_descriptor, decltype(&predecessors)>{
-            &predecessors}));
+        boost::visitor(
+            multi_predecessors_map_w_distances<Graph::edge_descriptor, decltype(&predecessors),
+                                               decltype(&distances[0])>{&predecessors,
+                                                                        &distances[0]}));
 
+    std::cout << "#distance from " << boost::get(boost::vertex_name, graph, src) << "\n";
+    for (auto v : boost::make_iterator_range(vertices(graph)))
+      std::cout << boost::get(boost::vertex_name, graph, v) << "    " << distances[v] << "\n";
+    std::cout << "#predecessor\n";
     for (auto [s, t] : predecessors)
       std::cout << boost::get(boost::vertex_name, graph, s) << " -> "
                 << boost::get(boost::vertex_name, graph, t) << "\n";
