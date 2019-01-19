@@ -10,9 +10,7 @@ class Base {
   virtual ~Base() {}
 
  public:
-  friend std::ostream& operator<<(std::ostream& os, const Base& b) {
-    return os << b.n;
-  }
+  friend std::ostream& operator<<(std::ostream& os, const Base& b) { return os << b.n; }
 
  public:
   virtual const char* f() const = 0;

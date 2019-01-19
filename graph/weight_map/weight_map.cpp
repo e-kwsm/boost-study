@@ -15,8 +15,7 @@ struct reach_threshold {};
 
 template <typename EdgeWeight>
 struct threshold_visitor : boost::default_dijkstra_visitor {
-  threshold_visitor(EdgeWeight threshold)
-      : threshold{threshold}, total_weight{0} {}
+  threshold_visitor(EdgeWeight threshold) : threshold{threshold}, total_weight{0} {}
 
   template <typename Edge, typename Graph>
   void examine_edge(Edge e, const Graph& g) {
@@ -24,8 +23,10 @@ struct threshold_visitor : boost::default_dijkstra_visitor {
   }
   template <typename Vertex, typename Graph>
   void finish_vertex(Vertex v, const Graph& g) {
-    if (min_weight) total_weight += *min_weight;
-    if (total_weight >= threshold) throw reach_threshold{};
+    if (min_weight)
+      total_weight += *min_weight;
+    if (total_weight >= threshold)
+      throw reach_threshold{};
     min_weight = boost::none;
   }
 
@@ -99,43 +100,33 @@ int main() {
   for (auto e : boost::make_iterator_range(edges(graph)))
     std::cout << e << '\t' << graph[e] << '\n';
 
-  auto output_distances = [&](Graph::vertex_descriptor src,
-                              Graph::vertex_descriptor dest) {
+  auto output_distances = [&](Graph::vertex_descriptor src, Graph::vertex_descriptor dest) {
     std::cout << "# boost::dijkstra_shortest_paths\n";
     std::vector<decltype(Edge::weight)> distances(boost::num_vertices(graph));
-    std::vector<Graph::vertex_descriptor> predecessors(
-        boost::num_vertices(graph));
+    std::vector<Graph::vertex_descriptor> predecessors(boost::num_vertices(graph));
     boost::dijkstra_shortest_paths(
         graph, src,
-        boost::weight_map(
-            boost::make_function_property_map<Graph::edge_descriptor>(
-                [&](const Graph::edge_descriptor& e) {
-                  return graph[e].weight;
-                }))
+        boost::weight_map(boost::make_function_property_map<Graph::edge_descriptor>(
+                              [&](const Graph::edge_descriptor& e) { return graph[e].weight; }))
             .distance_map(&distances[0])
             .predecessor_map(&predecessors[0]));
 
     for (auto i : boost::make_iterator_range(vertices(graph)))
-      std::cout << graph[src].name << " - " << graph[i].name << "\t"
-                << distances[i] << '\n';
+      std::cout << graph[src].name << " - " << graph[i].name << "\t" << distances[i] << '\n';
 
     for (auto v = dest; v != src; v = predecessors[v])
       std::cout << graph[v] << " - ";
     std::cout << graph[src] << '\n';
   };
 
-  auto output_distances_threshold = [&](Graph::vertex_descriptor src,
-                                        unsigned threshold) {
+  auto output_distances_threshold = [&](Graph::vertex_descriptor src, unsigned threshold) {
     std::cout << "# boost::dijkstra_shortest_paths w/ custom visitor\n";
     std::vector<decltype(Edge::weight)> distances(boost::num_vertices(graph));
     try {
       boost::dijkstra_shortest_paths(
           graph, src,
-          boost::weight_map(
-              boost::make_function_property_map<Graph::edge_descriptor>(
-                  [&](const Graph::edge_descriptor& e) {
-                    return graph[e].weight;
-                  }))
+          boost::weight_map(boost::make_function_property_map<Graph::edge_descriptor>(
+                                [&](const Graph::edge_descriptor& e) { return graph[e].weight; }))
               .distance_map(&distances[0])
               .visitor(threshold_visitor<decltype(Edge::weight)>{threshold}));
     } catch (reach_threshold) {
@@ -145,8 +136,7 @@ int main() {
       auto d = distances[i];
       if (d == std::numeric_limits<decltype(Edge::weight)>::max())
         std::cout << '#';
-      std::cout << graph[src].name << " - " << graph[i].name << "\t" << d
-                << '\n';
+      std::cout << graph[src].name << " - " << graph[i].name << "\t" << d << '\n';
     }
   };
 
@@ -156,8 +146,7 @@ int main() {
 #ifdef GRAPHVIZ
   std::string fname = "graph.dot";
   std::ofstream ofs{fname};
-  boost::write_graphviz(
-      ofs, graph, boost::make_label_writer(boost::get(&Vertex::name, graph)));
+  boost::write_graphviz(ofs, graph, boost::make_label_writer(boost::get(&Vertex::name, graph)));
   ofs.close();
   std::system(std::string{"dot -Tpng -ograph.png " + fname}.c_str());
 #endif

@@ -11,9 +11,7 @@ class C {
   ~C() {}
 
  public:
-  friend std::ostream& operator<<(std::ostream& os, const C& c) {
-    return os << c.n;
-  }
+  friend std::ostream& operator<<(std::ostream& os, const C& c) { return os << c.n; }
   int get() const noexcept;
 
  private:

@@ -28,11 +28,9 @@ int main() {
     if (width <= 0 || height <= 0) {
       throw std::invalid_argument{""};
     }
-    return (boost::format{"width=\"%1%\" height=\"%2%\""} % width % height)
-        .str();
+    return (boost::format{"width=\"%1%\" height=\"%2%\""} % width % height).str();
   };
-  boost::geometry::svg_mapper<point_t> mapper{svg, width, height,
-                                              width_height(width, height)};
+  boost::geometry::svg_mapper<point_t> mapper{svg, width, height, width_height(width, height)};
 
   mapper.add(ring);
   mapper.add(segment);
