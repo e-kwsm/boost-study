@@ -20,8 +20,7 @@ int main() {
     vector<shared_ptr<Base>> bs;
     bs.emplace_back(make_shared<Derived1>(d1n));
     bs.emplace_back(make_shared<Derived2>(d2n));
-    for (const auto& b : bs)
-      cout << *b << ' ' << b->f() << endl;
+    for (const auto& b : bs) cout << *b << ' ' << b->f() << endl;
 
     std::ofstream ofile{fname};
     boost::archive::xml_oarchive oa{ofile};
@@ -37,8 +36,7 @@ int main() {
 
     assert(bs[0]->get() == d1n);
     assert(bs[1]->get() == d2n);
-    for (const auto& b : bs)
-      cout << *b << ' ' << b->f() << endl;
+    for (const auto& b : bs) cout << *b << ' ' << b->f() << endl;
   }
 
   return 0;

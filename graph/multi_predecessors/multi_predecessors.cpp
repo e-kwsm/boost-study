@@ -4,45 +4,55 @@
 #include <map>
 #include <string>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/breadth_first_search.hpp>
 #include <boost/graph/graph_utility.hpp>
 #include <boost/graph/graphviz.hpp>
-#include <boost/graph/breadth_first_search.hpp>
 
-template<typename Edge, typename PredecessorsMap>
+template <typename Edge, typename PredecessorsMap>
 class multi_predecessors_map : public boost::default_bfs_visitor {
-public:
-  multi_predecessors_map(PredecessorsMap predecessors_map) : predecessors_map{predecessors_map} {}
+ public:
+  multi_predecessors_map(PredecessorsMap predecessors_map)
+      : predecessors_map{predecessors_map} {}
 
-  template<typename Graph> void examine_edge(Edge e, const Graph& g) { edges.push_back(e); }
+  template <typename Graph>
+  void examine_edge(Edge e, const Graph& g) {
+    edges.push_back(e);
+  }
 
-  template<typename Graph> void black_target(Edge e, const Graph& g) {
-    edges.erase(std::remove_if(edges.begin(), edges.end(), [=](Edge e2) { return e == e2; }),
+  template <typename Graph>
+  void black_target(Edge e, const Graph& g) {
+    edges.erase(std::remove_if(edges.begin(), edges.end(),
+                               [=](Edge e2) { return e == e2; }),
                 edges.end());
   }
 
-  template<typename Vertex, typename Graph> void finish_vertex(Vertex v, const Graph& g) {
+  template <typename Vertex, typename Graph>
+  void finish_vertex(Vertex v, const Graph& g) {
     for (auto e : edges)
       predecessors_map->insert({boost::target(e, g), boost::source(e, g)});
     edges.clear();
   }
 
-protected:
+ protected:
   PredecessorsMap predecessors_map;
   std::vector<Edge> edges;
 };
 
-template<typename Edge, typename PredecessorsMap, typename DistanceMap>
-class multi_predecessors_map_w_distances : public multi_predecessors_map<Edge, PredecessorsMap> {
-public:
-  multi_predecessors_map_w_distances(PredecessorsMap predecessors_map, DistanceMap distance_map)
-      : multi_predecessors_map<Edge, PredecessorsMap>{predecessors_map}, distance_map{
-                                                                             distance_map} {}
+template <typename Edge, typename PredecessorsMap, typename DistanceMap>
+class multi_predecessors_map_w_distances
+    : public multi_predecessors_map<Edge, PredecessorsMap> {
+ public:
+  multi_predecessors_map_w_distances(PredecessorsMap predecessors_map,
+                                     DistanceMap distance_map)
+      : multi_predecessors_map<Edge, PredecessorsMap>{predecessors_map},
+        distance_map{distance_map} {}
 
-  template<typename Graph> void tree_edge(Edge e, const Graph& g) {
+  template <typename Graph>
+  void tree_edge(Edge e, const Graph& g) {
     distance_map[boost::target(e, g)] = distance_map[boost::source(e, g)] + 1;
   }
 
-private:
+ private:
   DistanceMap distance_map;
 };
 
@@ -58,12 +68,12 @@ int main() {
    *
    */
 
-  using Graph =
-      boost::adjacency_list<boost::listS,                                      // OutEdgeList
-                            boost::vecS,                                       // VertexList
-                            boost::undirectedS,                                // Directed
-                            boost::property<boost::vertex_name_t, std::string> // VertexProperties
-                            >;
+  using Graph = boost::adjacency_list<
+      boost::listS,                                       // OutEdgeList
+      boost::vecS,                                        // VertexList
+      boost::undirectedS,                                 // Directed
+      boost::property<boost::vertex_name_t, std::string>  // VertexProperties
+      >;
   Graph graph;
 
   const auto va = boost::add_vertex({"A"}, graph);
@@ -91,26 +101,29 @@ int main() {
 #ifdef GRAPHVIZ
   std::string fname = "graph.dot";
   std::ofstream ofs{fname};
-  boost::write_graphviz(ofs, graph,
-                        boost::make_label_writer(boost::get(boost::vertex_name, graph)));
+  boost::write_graphviz(
+      ofs, graph,
+      boost::make_label_writer(boost::get(boost::vertex_name, graph)));
   ofs.close();
   std::system(std::string{"dot -Tpng -ograph.png " + fname}.c_str());
 #endif
 
   auto output_distances = [&](Graph::vertex_descriptor src) {
-    std::multimap<Graph::vertex_descriptor, Graph::vertex_descriptor> predecessors;
+    std::multimap<Graph::vertex_descriptor, Graph::vertex_descriptor>
+        predecessors;
     std::vector<unsigned> distances(boost::num_vertices(graph));
 
     boost::breadth_first_search(
         graph, src,
-        boost::visitor(
-            multi_predecessors_map_w_distances<Graph::edge_descriptor, decltype(&predecessors),
-                                               decltype(&distances[0])>{&predecessors,
-                                                                        &distances[0]}));
+        boost::visitor(multi_predecessors_map_w_distances<
+                       Graph::edge_descriptor, decltype(&predecessors),
+                       decltype(&distances[0])>{&predecessors, &distances[0]}));
 
-    std::cout << "#distance from " << boost::get(boost::vertex_name, graph, src) << "\n";
+    std::cout << "#distance from " << boost::get(boost::vertex_name, graph, src)
+              << "\n";
     for (auto v : boost::make_iterator_range(vertices(graph)))
-      std::cout << boost::get(boost::vertex_name, graph, v) << "    " << distances[v] << "\n";
+      std::cout << boost::get(boost::vertex_name, graph, v) << "    "
+                << distances[v] << "\n";
     std::cout << "#predecessor\n";
     for (auto [s, t] : predecessors)
       std::cout << boost::get(boost::vertex_name, graph, s) << " -> "

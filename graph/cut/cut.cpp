@@ -18,14 +18,14 @@ int main() {
    *    I
    */
 
-  boost::adjacency_list<boost::listS,                                       // OutEdgeList
-                        boost::vecS,                                        // VertexList
-                        boost::undirectedS,                                 // Directed
-                        boost::property<boost::vertex_name_t, std::string>, // VertexProperties
-                        boost::property<boost::edge_weight_t, unsigned>     // EdgeProperties
-                        >
+  boost::adjacency_list<
+      boost::listS,                                        // OutEdgeList
+      boost::vecS,                                         // VertexList
+      boost::undirectedS,                                  // Directed
+      boost::property<boost::vertex_name_t, std::string>,  // VertexProperties
+      boost::property<boost::edge_weight_t, unsigned>      // EdgeProperties
+      >
       graph;
-  ;
 
   const auto va = boost::add_vertex({"A"}, graph);
   const auto vb = boost::add_vertex({"B"}, graph);
@@ -52,24 +52,28 @@ int main() {
   boost::add_edge(vg, vi, {1}, graph);
   boost::add_edge(vh, vi, {1}, graph);
 
-  auto parities = boost::make_one_bit_color_map(boost::num_vertices(graph),
-                                                boost::get(boost::vertex_index, graph));
-  const auto w = boost::stoer_wagner_min_cut(graph, boost::get(boost::edge_weight, graph),
-                                             boost::parity_map(parities));
+  auto parities = boost::make_one_bit_color_map(
+      boost::num_vertices(graph), boost::get(boost::vertex_index, graph));
+  const auto w =
+      boost::stoer_wagner_min_cut(graph, boost::get(boost::edge_weight, graph),
+                                  boost::parity_map(parities));
   std::cout << "cut weight: " << w << std::endl;
 
   for (size_t i = 0; i < boost::num_vertices(graph); i++) {
     if (boost::get(parities, i))
-      std::cout << "one side\t" << boost::get(boost::vertex_name, graph, i) << "\n";
+      std::cout << "one side\t" << boost::get(boost::vertex_name, graph, i)
+                << "\n";
     else
-      std::cout << "the other\t" << boost::get(boost::vertex_name, graph, i) << "\n";
+      std::cout << "the other\t" << boost::get(boost::vertex_name, graph, i)
+                << "\n";
   }
 
 #ifdef GRAPHVIZ
   std::string fname = "graph.dot";
   std::ofstream ofs{fname};
-  boost::write_graphviz(ofs, graph,
-                        boost::make_label_writer(boost::get(boost::vertex_name, graph)));
+  boost::write_graphviz(
+      ofs, graph,
+      boost::make_label_writer(boost::get(boost::vertex_name, graph)));
   ofs.close();
   std::system(std::string{"dot -Tpng -ograph.png " + fname}.c_str());
 #endif
