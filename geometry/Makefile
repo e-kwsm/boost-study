@@ -10,15 +10,8 @@ TARGET   := $(SRCS:.cpp=)
 all: $(TARGET)
 
 %: %.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $< $(LDFLAGS) $(LDLIBS)
 
 .PHONY: clean
 clean:
 	rm -f $(TARGET)
-
-.PHONY: distclean
-distclean: clean
-	rm -f tags
-
-tags: $(SRCS)
-	ctags $^

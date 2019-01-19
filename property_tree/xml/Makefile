@@ -1,5 +1,5 @@
 CXX      := clang++
-CXXFLAGS := -std=c++14
+CXXFLAGS := -std=c++17
 CPPFLAGS :=
 LDFLAGS  :=
 LDLIBS   :=
@@ -10,15 +10,8 @@ TARGET   := $(SRCS:.cpp=)
 all: $(TARGET)
 
 %: %.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $< $(LDFLAGS) $(LDLIBS)
 
 .PHONY: clean
 clean:
 	rm -f $(TARGET)
-
-.PHONY: distclean
-distclean: clean
-	rm -f tags
-
-tags: $(SRCS)
-	ctags $^

@@ -10,7 +10,7 @@ TARGET   := $(SRCS:.cpp=)
 all: $(TARGET)
 
 %: %.cpp
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $<
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -o $@ $< $(LDFLAGS) $(LDLIBS)
 
 .PHONY: clean
 clean:
