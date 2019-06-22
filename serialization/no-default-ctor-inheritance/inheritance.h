@@ -17,12 +17,12 @@ class Base {
   int get() const noexcept { return n; }
 
  public:
-  template <class Archive>
+  template<class Archive>
   void SaveConstDataCommon(Archive& ar, unsigned version) const;
 
  protected:
   friend boost::serialization::access;
-  template <class Archive>
+  template<class Archive>
   void serialize(Archive& ar, const unsigned version);
 
  protected:
@@ -40,7 +40,7 @@ class Derived1 : public Base {
 
  private:
   friend boost::serialization::access;
-  template <class Archive>
+  template<class Archive>
   void serialize(Archive& ar, const unsigned version);
 };
 
@@ -55,7 +55,7 @@ class Derived2 : public Base {
 
  private:
   friend class boost::serialization::access;
-  template <class Archive>
+  template<class Archive>
   void serialize(Archive& ar, const unsigned version);
 };
 

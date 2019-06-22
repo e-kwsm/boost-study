@@ -6,29 +6,27 @@
 #include <boost/serialization/unique_ptr.hpp>
 #include "no-default-ctor.h"
 
-using namespace std;
-
 int main() {
   constexpr int n = 42;
   constexpr auto fname = "serial.xml";
 
   {
-    auto p = make_unique<C>(n);
-    cout << *p << endl;
+    auto p = std::make_unique<C>(n);
+    std::cout << *p << '\n';
 
     std::ofstream ofile{fname};
     boost::archive::xml_oarchive oa{ofile};
     oa << BOOST_SERIALIZATION_NVP(p);
   }
   {
-    unique_ptr<C> p;
+    std::unique_ptr<C> p;
 
     std::ifstream ifile{fname};
     boost::archive::xml_iarchive ia{ifile};
     ia >> BOOST_SERIALIZATION_NVP(p);
 
     assert(n == p->get());
-    cout << *p << endl;
+    std::cout << *p << '\n';
   }
 
   return 0;

@@ -13,15 +13,15 @@
 
 struct reach_threshold {};
 
-template <typename EdgeWeight>
+template<typename EdgeWeight>
 struct threshold_visitor : boost::default_dijkstra_visitor {
   threshold_visitor(EdgeWeight threshold) : threshold{threshold}, total_weight{0} {}
 
-  template <typename Edge, typename Graph>
+  template<typename Edge, typename Graph>
   void examine_edge(Edge e, const Graph& g) {
     min_weight = min_weight ? std::min(*min_weight, g[e].weight) : g[e].weight;
   }
-  template <typename Vertex, typename Graph>
+  template<typename Vertex, typename Graph>
   void finish_vertex(Vertex v, const Graph& g) {
     if (min_weight)
       total_weight += *min_weight;

@@ -4,11 +4,8 @@
 #include <boost/units/io.hpp>
 #include <boost/units/systems/si.hpp>
 #include <boost/units/systems/si/prefixes.hpp>
-#include <boost/version.hpp>
 
 int main() {
-  std::cout << BOOST_LIB_VERSION << '\n';
-
   using length_t = boost::units::quantity<boost::units::si::length, double>;
   using dimensionless_t = boost::units::quantity<boost::units::si::dimensionless, double>;
   constexpr length_t meter{1.0 * boost::units::si::meter};

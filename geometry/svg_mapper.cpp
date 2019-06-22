@@ -25,9 +25,8 @@ int main() {
   constexpr int width = 300;
   constexpr int height = 600;
   auto width_height = [](auto width, auto height) {
-    if (width <= 0 || height <= 0) {
+    if (width <= 0 || height <= 0)
       throw std::invalid_argument{""};
-    }
     return (boost::format{"width=\"%1%\" height=\"%2%\""} % width % height).str();
   };
   boost::geometry::svg_mapper<point_t> mapper{svg, width, height, width_height(width, height)};

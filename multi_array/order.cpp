@@ -5,9 +5,9 @@
 int main() {
   constexpr unsigned ni = 3, nj = 4, nk = 5;
   constexpr unsigned num_elements = ni * nj * nk;
-  boost::multi_array<unsigned, 3u>
-      ma_c{boost::extents[ni][nj][nk], boost::c_storage_order{}},  // default order
-      ma_f{boost::extents[ni][nj][nk], boost::fortran_storage_order{}};
+  // default order
+  boost::multi_array<unsigned, 3u> ma_c{boost::extents[ni][nj][nk], boost::c_storage_order{}};
+  boost::multi_array<unsigned, 3u> ma_f{boost::extents[ni][nj][nk], boost::fortran_storage_order{}};
 
   auto itr_c = ma_c.data();
   auto itr_f = ma_f.data();

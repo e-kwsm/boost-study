@@ -8,23 +8,23 @@
 #include <boost/graph/graph_utility.hpp>
 #include <boost/graph/graphviz.hpp>
 
-template <typename Edge, typename PredecessorsMap>
+template<typename Edge, typename PredecessorsMap>
 class multi_predecessors_map : public boost::default_bfs_visitor {
  public:
   multi_predecessors_map(PredecessorsMap predecessors_map) : predecessors_map{predecessors_map} {}
 
-  template <typename Graph>
+  template<typename Graph>
   void examine_edge(Edge e, const Graph& g) {
     edges.push_back(e);
   }
 
-  template <typename Graph>
+  template<typename Graph>
   void black_target(Edge e, const Graph& g) {
     edges.erase(std::remove_if(edges.begin(), edges.end(), [=](Edge e2) { return e == e2; }),
                 edges.end());
   }
 
-  template <typename Vertex, typename Graph>
+  template<typename Vertex, typename Graph>
   void finish_vertex(Vertex v, const Graph& g) {
     for (auto e : edges)
       predecessors_map->insert({boost::target(e, g), boost::source(e, g)});
@@ -36,14 +36,14 @@ class multi_predecessors_map : public boost::default_bfs_visitor {
   std::vector<Edge> edges;
 };
 
-template <typename Edge, typename PredecessorsMap, typename DistanceMap>
+template<typename Edge, typename PredecessorsMap, typename DistanceMap>
 class multi_predecessors_map_w_distances : public multi_predecessors_map<Edge, PredecessorsMap> {
  public:
   multi_predecessors_map_w_distances(PredecessorsMap predecessors_map, DistanceMap distance_map)
       : multi_predecessors_map<Edge, PredecessorsMap>{predecessors_map},
         distance_map{distance_map} {}
 
-  template <typename Graph>
+  template<typename Graph>
   void tree_edge(Edge e, const Graph& g) {
     distance_map[boost::target(e, g)] = distance_map[boost::source(e, g)] + 1;
   }

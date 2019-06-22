@@ -55,13 +55,13 @@ int main() {
                                                 boost::get(boost::vertex_index, graph));
   const auto w = boost::stoer_wagner_min_cut(graph, boost::get(boost::edge_weight, graph),
                                              boost::parity_map(parities));
-  std::cout << "cut weight: " << w << std::endl;
+  std::cout << "cut weight: " << w << '\n';
 
   for (size_t i = 0; i < boost::num_vertices(graph); i++) {
     if (boost::get(parities, i))
-      std::cout << "one side\t" << boost::get(boost::vertex_name, graph, i) << "\n";
+      std::cout << "one side\t" << boost::get(boost::vertex_name, graph, i) << '\n';
     else
-      std::cout << "the other\t" << boost::get(boost::vertex_name, graph, i) << "\n";
+      std::cout << "the other\t" << boost::get(boost::vertex_name, graph, i) << '\n';
   }
 
 #ifdef GRAPHVIZ

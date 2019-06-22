@@ -16,30 +16,30 @@ class C {
 
  private:
   friend boost::serialization::access;
-  template <typename Archive>
+  template<typename Archive>
   void serialize(Archive& ar, unsigned version);
 
  private:
   int n;
 };
 
-template <typename Archive>
+template<typename Archive>
 void C::serialize(Archive& ar, unsigned version) {
   // do nothing
-  std::cerr << __PRETTY_FUNCTION__ << std::endl;
+  std::cerr << __PRETTY_FUNCTION__ << '\n';
 }
 
 namespace boost::serialization {
-template <typename Archive>
+template<typename Archive>
 void save_construct_data(Archive& ar, const C* c, unsigned version) {
-  std::cerr << __PRETTY_FUNCTION__ << std::endl;
+  std::cerr << __PRETTY_FUNCTION__ << '\n';
   int n{c->get()};
   ar << BOOST_SERIALIZATION_NVP(n);
 }
 
-template <typename Archive>
+template<typename Archive>
 void load_construct_data(Archive& ar, C* c, unsigned version) {
-  std::cerr << __PRETTY_FUNCTION__ << std::endl;
+  std::cerr << __PRETTY_FUNCTION__ << '\n';
   int n;
   ar >> BOOST_SERIALIZATION_NVP(n);
   ::new (c) C{n};
