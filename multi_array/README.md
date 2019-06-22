@@ -1,1 +1,1 @@
-[Boost.MultiArray](http://www.boost.org/libs/multi_array/doc/)
+[Boost.MultiArray](https://www.boost.org/doc/libs/release/libs/multi_array/)

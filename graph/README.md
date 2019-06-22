@@ -1,1 +1,1 @@
-[Boost Graph](http://www.boost.org/libs/graph/doc/)
+[Boost.Graph](https://www.boost.org/doc/libs/release/libs/graph/)

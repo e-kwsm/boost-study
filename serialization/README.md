@@ -1,1 +1,1 @@
-[Boost Serialization](http://www.boost.org/libs/serialization/doc/)
+[Boost.Serialization](https://www.boost.org/doc/libs/release/libs/serialization/)

@@ -1,1 +1,1 @@
-[Boost PropertyTree](http://www.boost.org/libs/property_tree/)
+[Boost.PropertyTree](https://www.boost.org/doc/libs/release/libs/property_tree/)
